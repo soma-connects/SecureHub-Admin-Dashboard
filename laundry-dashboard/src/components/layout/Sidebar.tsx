@@ -88,5 +88,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     </div>
                 </div>
             </aside>
-            );
+        </>
+    );
 }
