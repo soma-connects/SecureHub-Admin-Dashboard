@@ -1,0 +1,13 @@
+{
+  "figma": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "@figmcp/mcp-server",
+      "--stdio"
+    ],
+    "env": {
+      "FIGMA_ACCESS_TOKEN": "figd_58HYtw2XwuApbwAtGMvZUeO1gvZRDuMFvAUbwJVY"
+    }
+  }
+}
