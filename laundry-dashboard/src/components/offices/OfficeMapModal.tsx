@@ -1,9 +1,10 @@
 import { X, MapPin, Clock, Phone, Mail } from 'lucide-react';
+import type { Office } from '../../types';
 
 interface OfficeMapModalProps {
     isOpen: boolean;
     onClose: () => void;
-    office: any; // In real app, use proper type
+    office: Office | null; // In real app, use proper type
 }
 
 export function OfficeMapModal({ isOpen, onClose, office }: OfficeMapModalProps) {

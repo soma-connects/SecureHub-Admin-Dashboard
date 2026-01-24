@@ -2,8 +2,9 @@ import { Search } from 'lucide-react';
 import { ServiceCard } from './ServiceCard';
 import { useState } from 'react';
 import { ServiceModal } from './ServiceModal';
+import type { Service } from '../../types';
 
-const services = [
+const services: Service[] = [
     {
         id: 'SRV-001',
         name: 'Wash & Fold',
@@ -68,9 +69,9 @@ const services = [
 
 export function ServicesGrid() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingService, setEditingService] = useState<any>(null);
+    const [editingService, setEditingService] = useState<Service | null>(null);
 
-    const handleEdit = (service: any) => {
+    const handleEdit = (service: Service) => {
         setEditingService(service);
         setIsModalOpen(true);
     };

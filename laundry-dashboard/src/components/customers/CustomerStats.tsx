@@ -1,4 +1,4 @@
-import { Users, UserCheck, Crown } from 'lucide-react';
+import { Users, UserCheck, Crown, type LucideProps } from 'lucide-react';
 
 export function CustomerStats() {
     const stats = [
@@ -9,7 +9,7 @@ export function CustomerStats() {
     ];
 
     // Helper to avoid import error for custom/complex icon if needed, or reuse Users
-    function users_avg_icon(props: any) {
+    function users_avg_icon(props: LucideProps) {
         return <Users {...props} />
     }
 

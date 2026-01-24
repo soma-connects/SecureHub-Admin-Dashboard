@@ -1,9 +1,10 @@
 import { X, Clock } from 'lucide-react';
+import type { Office } from '../../types';
 
 interface OfficeModalProps {
     isOpen: boolean;
     onClose: () => void;
-    office?: any;
+    office?: Office | null;
 }
 
 export function OfficeModal({ isOpen, onClose, office }: OfficeModalProps) {

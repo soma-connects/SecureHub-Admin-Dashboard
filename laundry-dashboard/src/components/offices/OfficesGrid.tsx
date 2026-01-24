@@ -3,6 +3,7 @@ import { OfficeCard } from './OfficeCard';
 import { useState } from 'react';
 import { OfficeModal } from './OfficeModal';
 import { OfficeMapModal } from './OfficeMapModal';
+import type { Office } from '../../types';
 
 const offices = [
     {
@@ -100,14 +101,14 @@ const offices = [
 export function OfficesGrid() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isMapModalOpen, setIsMapModalOpen] = useState(false);
-    const [currentOffice, setCurrentOffice] = useState<any>(null);
+    const [currentOffice, setCurrentOffice] = useState<Office | null>(null);
 
-    const handleEdit = (office: any) => {
+    const handleEdit = (office: Office) => {
         setCurrentOffice(office);
         setIsModalOpen(true);
     };
 
-    const handleViewMap = (office: any) => {
+    const handleViewMap = (office: Office) => {
         setCurrentOffice(office);
         setIsMapModalOpen(true);
     };

@@ -1,9 +1,10 @@
 import { X } from 'lucide-react';
+import type { Service } from '../../types';
 
 interface ServiceModalProps {
     isOpen: boolean;
     onClose: () => void;
-    service?: any; // In a real app, define a proper type
+    service?: Service | null; // In a real app, define a proper type
 }
 
 export function ServiceModal({ isOpen, onClose, service }: ServiceModalProps) {
