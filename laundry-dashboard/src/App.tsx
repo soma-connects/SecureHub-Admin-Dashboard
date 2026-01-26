@@ -7,10 +7,13 @@ import Offices from './pages/Offices';
 import Notifications from './pages/Notifications';
 import Settings from './pages/Settings';
 
+import { Login } from './pages/Login';
+
 function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/login" element={<Login />} />
         <Route path="/" element={<Dashboard />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/customers" element={<Customers />} />

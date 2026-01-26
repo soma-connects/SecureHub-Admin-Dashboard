@@ -3,10 +3,13 @@ export interface Order {
     customer: {
         name: string;
         email: string;
+        phone?: string;
+        address?: string;
     };
     service: {
         name: string;
         items: number;
+        category?: string;
     };
     date: {
         pickup: string;
@@ -20,8 +23,8 @@ export interface Order {
 export const mockOrders: Order[] = [
     {
         id: '#ORD-1234',
-        customer: { name: 'John Doe', email: 'john.doe@email.com' },
-        service: { name: 'Wash & Fold', items: 12 },
+        customer: { name: 'John Doe', email: 'john.doe@email.com', phone: '+1 (555) 123-4567', address: '123 Main St, New York, NY' },
+        service: { name: 'Wash & Fold', items: 12, category: 'Washing' },
         date: { pickup: '2026-01-18', delivery: '2026-01-20' },
         amount: '$25.00',
         status: 'Completed',
@@ -29,8 +32,8 @@ export const mockOrders: Order[] = [
     },
     {
         id: '#ORD-1235',
-        customer: { name: 'Jane Smith', email: 'jane.smith@email.com' },
-        service: { name: 'Dry Cleaning', items: 5 },
+        customer: { name: 'Jane Smith', email: 'jane.smith@email.com', phone: '+1 (555) 987-6543', address: '456 Park Ave, New York, NY' },
+        service: { name: 'Dry Cleaning', items: 5, category: 'Dry Clean' },
         date: { pickup: '2026-01-18', delivery: '2026-01-21' },
         amount: '$45.00',
         status: 'Processing',
@@ -38,8 +41,8 @@ export const mockOrders: Order[] = [
     },
     {
         id: '#ORD-1236',
-        customer: { name: 'Robert Johnson', email: 'robert.j@email.com' },
-        service: { name: 'Iron Only', items: 8 },
+        customer: { name: 'Robert Johnson', email: 'robert.j@email.com', phone: '+1 (555) 456-7890', address: '789 Broadway, New York, NY' },
+        service: { name: 'Iron Only', items: 8, category: 'Ironing' },
         date: { pickup: '2026-01-19', delivery: '2026-01-21' },
         amount: '$30.00',
         status: 'Pending',

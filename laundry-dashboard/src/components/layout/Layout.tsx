@@ -10,20 +10,20 @@ export function Layout({ children }: LayoutProps) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+        <div className="min-h-screen bg-slate-950 font-sans text-slate-100 selection:bg-violet-500/30">
             <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
             {/* Mobile Header */}
-            <div className="lg:hidden bg-white border-b border-slate-200 p-4 sticky top-0 z-30 flex items-center justify-between">
+            <div className="lg:hidden glass-panel border-b border-slate-800 p-4 sticky top-0 z-30 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setIsSidebarOpen(true)}
-                        className="p-2 hover:bg-slate-100 rounded-lg text-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-200"
+                        className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-700"
                         aria-label="Open menu"
                     >
                         <Menu className="w-6 h-6" />
                     </button>
-                    <span className="font-bold text-lg text-slate-900">LaundryHub</span>
+                    <span className="font-bold text-lg text-slate-100">LaundryHub</span>
                 </div>
             </div>
 

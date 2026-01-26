@@ -16,18 +16,18 @@ export function CustomerStats() {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {stats.map((stat, index) => (
-                <div key={index} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div key={index} className="glass-card p-6 rounded-2xl border border-slate-800">
                     <div className="flex items-start justify-between mb-4">
                         <div>
-                            <p className="text-slate-500 text-sm font-medium mb-1">{stat.label}</p>
-                            <h3 className="text-3xl font-bold text-slate-900">{stat.value}</h3>
+                            <p className="text-slate-400 text-sm font-medium mb-1">{stat.label}</p>
+                            <h3 className="text-3xl font-bold text-slate-100">{stat.value}</h3>
                         </div>
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.bg}`}>
-                            <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center bg-opacity-10 ${stat.bg.replace('100', '500')}`}>
+                            <stat.icon className={`w-6 h-6 ${stat.color.replace('600', '400')}`} />
                         </div>
                     </div>
 
-                    <span className={`text-xs font-medium ${stat.isPositive === true ? 'text-emerald-600' : stat.isPositive === false ? 'text-rose-600' : 'text-purple-600'}`}>
+                    <span className={`text-xs font-medium ${stat.isPositive === true ? 'text-emerald-400' : stat.isPositive === false ? 'text-rose-400' : 'text-purple-400'}`}>
                         {stat.change}
                     </span>
                 </div>

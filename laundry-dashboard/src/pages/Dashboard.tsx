@@ -2,80 +2,161 @@ import { Layout } from '../components/layout/Layout';
 import { StatCard } from '../components/dashboard/StatCard';
 import { RevenueChart } from '../components/dashboard/RevenueChart';
 import { OrdersChart } from '../components/dashboard/OrdersChart';
-import { RecentOrders } from '../components/dashboard/RecentOrders';
-import { DollarSign, ShoppingBag, Users, Clock, Calendar, ChevronDown } from 'lucide-react';
-import { ServiceDistributionChart } from '../components/dashboard/ServiceDistributionChart';
+import { ServiceHealthCard } from '../components/dashboard/ServiceHealthCard';
+import { SystemMetrics } from '../components/dashboard/SystemMetrics';
+import { LiveLogStream } from '../components/dashboard/LiveLogStream';
+import { DollarSign, ShoppingBag, Users, Clock } from 'lucide-react';
+import { useDateRange } from '../context/DateRangeContext';
+import { useEffect, useState } from 'react';
 
 function Dashboard() {
+    const { dateRange } = useDateRange();
+    const [stats, setStats] = useState({
+        totalRevenue: '$0',
+        totalOrders: 0,
+        activeCustomers: 0,
+        pendingOrders: 0,
+        revenueChart: [],
+        ordersChart: []
+    });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            setLoading(true);
+            try {
+                const query = new URLSearchParams({
+                    startDate: dateRange.start.toISOString(),
+                    endDate: dateRange.end.toISOString()
+                });
+                // Assuming backend is proxying or we call supabase directly. 
+                // Since I implemented /api/analytics in backend, I should call that.
+                // But frontend runs on 5173 and backend on 3001. I need to ensure CORS or proxy.
+                // For now assuming localhost:3001
+                const response = await fetch(`http://localhost:3001/api/analytics/stats?${query}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setStats(data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch stats:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchStats();
+    }, [dateRange]);
+
     return (
         <Layout>
             <div className="mb-8">
-                <div className="mb-6 flex items-start justify-between">
-                    <div>
-                        <h2 className="text-2xl font-bold text-slate-900">Dashboard Overview</h2>
-                        <p className="text-slate-500 text-sm">Welcome back! Here's what's happening with your laundry marketplace.</p>
-                    </div>
-                    <button className="hidden md:flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors">
-                        <Calendar className="w-4 h-4 text-slate-500" />
-                        <span>Last 7 days</span>
-                        <ChevronDown className="w-4 h-4 text-slate-400" />
-                    </button>
+                <div className="mb-6">
+                    <h2 className="text-2xl font-bold text-slate-100">Command Center</h2>
+                    <p className="text-slate-400 text-sm">System Overview & Microservices Health</p>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                {/* KPI Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     <StatCard
                         label="Total Revenue"
-                        value="$45,231"
-                        trend="+20.1%"
+                        value={stats.totalRevenue}
+                        trend="+20.1%" // Calculation would need historical data comparison
                         trendDirection="up"
                         icon={DollarSign}
-                        iconColor="text-emerald-600"
-                        iconBgColor="bg-emerald-100"
+                        iconColor="text-emerald-400"
+                        iconBgColor="bg-emerald-500/10"
                     />
                     <StatCard
                         label="Total Orders"
-                        value="1,234"
+                        value={stats.totalOrders.toString()}
                         trend="+15.3%"
                         trendDirection="up"
                         icon={ShoppingBag}
-                        iconColor="text-blue-600"
-                        iconBgColor="bg-blue-100"
+                        iconColor="text-blue-400"
+                        iconBgColor="bg-blue-500/10"
                     />
                     <StatCard
                         label="Active Customers"
-                        value="892"
+                        value={stats.activeCustomers.toString()}
                         trend="+12.5%"
                         trendDirection="up"
                         icon={Users}
-                        iconColor="text-violet-600"
-                        iconBgColor="bg-violet-100"
+                        iconColor="text-violet-400"
+                        iconBgColor="bg-violet-500/10"
                     />
                     <StatCard
                         label="Pending Orders"
-                        value="23"
-                        trend="-4.2%"
-                        trendDirection="down"
+                        value={stats.pendingOrders.toString()}
+                        trend={stats.pendingOrders > 10 ? "High Load" : "Normal"}
+                        trendDirection={stats.pendingOrders > 10 ? "down" : "up"}
                         icon={Clock}
-                        iconColor="text-amber-600"
-                        iconBgColor="bg-amber-100"
+                        iconColor="text-amber-400"
+                        iconBgColor="bg-amber-500/10"
                     />
                 </div>
-            </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                <div className="lg:col-span-2">
-                    <RevenueChart />
+                {/* Microservices Health Grid */}
+                <div className="mb-8">
+                    <h3 className="text-slate-200 font-semibold mb-4 text-lg">Microservices Status</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <ServiceHealthCard
+                            name="Auth Service"
+                            status="online"
+                            uptime="99.99%"
+                            replicas={5}
+                            latency="45ms"
+                        />
+                        <ServiceHealthCard
+                            name="Order Service"
+                            status="online"
+                            uptime="99.95%"
+                            replicas={3}
+                            latency="120ms"
+                        />
+                        <ServiceHealthCard
+                            name="Payment Gateway"
+                            status="degraded"
+                            uptime="98.50%"
+                            replicas={2}
+                            latency="850ms"
+                        />
+                        <ServiceHealthCard
+                            name="Notification Svc"
+                            status="online"
+                            uptime="99.99%"
+                            replicas={4}
+                            latency="25ms"
+                        />
+                    </div>
                 </div>
-                <div>
-                    <OrdersChart />
-                </div>
-            </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2">
-                    <RecentOrders />
+                {/* Observability Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <div className="lg:col-span-2 h-[350px]">
+                        <SystemMetrics />
+                    </div>
+                    <div className="h-[350px]">
+                        <LiveLogStream />
+                    </div>
                 </div>
-                <div>
-                    <ServiceDistributionChart />
+
+                {/* Bottom Section: Charts */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2">
+                        {loading ? (
+                            <div className="h-[350px] glass-panel rounded-2xl animate-pulse bg-slate-800/50" />
+                        ) : (
+                            <RevenueChart data={stats.revenueChart} />
+                        )}
+                    </div>
+                    <div>
+                        {loading ? (
+                            <div className="h-[350px] glass-panel rounded-2xl animate-pulse bg-slate-800/50" />
+                        ) : (
+                            <OrdersChart data={stats.ordersChart} />
+                        )}
+                    </div>
                 </div>
             </div>
         </Layout>

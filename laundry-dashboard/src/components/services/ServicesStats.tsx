@@ -9,9 +9,9 @@ export function ServicesStats() {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {stats.map((stat) => (
-                <div key={stat.label} className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-                    <p className="text-sm text-slate-500 font-medium mb-2">{stat.label}</p>
-                    <h3 className="text-3xl font-bold text-slate-900 mb-1">{stat.value}</h3>
+                <div key={stat.label} className="glass-panel p-6 rounded-xl">
+                    <p className="text-sm text-slate-400 font-medium mb-2">{stat.label}</p>
+                    <h3 className="text-3xl font-bold text-slate-200 mb-1">{stat.value}</h3>
                     <p className={`text-xs font-medium ${stat.color}`}>{stat.subtext}</p>
                 </div>
             ))}

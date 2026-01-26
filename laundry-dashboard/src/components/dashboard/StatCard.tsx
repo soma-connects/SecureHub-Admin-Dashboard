@@ -1,4 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface StatCardProps {
@@ -13,25 +14,26 @@ interface StatCardProps {
 
 export function StatCard({ label, value, trend, trendDirection, icon: Icon, iconColor, iconBgColor }: StatCardProps) {
     return (
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-            <div className="flex justify-between items-start mb-4">
-                <div>
-                    <p className="text-slate-500 text-sm font-medium mb-1">{label}</p>
-                    <h3 className="text-2xl font-bold text-slate-900">{value}</h3>
+        <div className="glass-card rounded-2xl p-6 border border-slate-800">
+            <div className="flex items-center justify-between mb-4">
+                <div className={clsx("p-3 rounded-xl bg-opacity-20", iconBgColor)}>
+                    <Icon className={clsx("w-6 h-6", iconColor)} />
                 </div>
-                <div className={clsx("p-3 rounded-xl", iconBgColor || "bg-blue-100")}>
-                    <Icon className={clsx("w-6 h-6", iconColor || "text-blue-600")} />
-                </div>
+                {trend && (
+                    <div className={clsx(
+                        "flex items-center gap-1 text-sm font-medium px-2 py-1 rounded-lg border",
+                        trendDirection === 'up'
+                            ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+                            : "text-rose-400 bg-rose-500/10 border-rose-500/20"
+                    )}>
+                        {trendDirection === 'up' ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
+                        {trend}
+                    </div>
+                )}
             </div>
-
-            <div className="flex items-center gap-2">
-                <span className={clsx(
-                    "text-sm font-medium",
-                    trendDirection === 'up' ? "text-emerald-500" : "text-rose-500"
-                )}>
-                    {trend}
-                </span>
-                <span className="text-slate-400 text-sm">from last period</span>
+            <div>
+                <p className="text-slate-400 text-sm font-medium mb-1">{label}</p>
+                <h3 className="text-2xl font-bold text-slate-100">{value}</h3>
             </div>
         </div>
     );

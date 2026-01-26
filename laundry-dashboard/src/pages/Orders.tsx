@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import type { Order } from '../types';
 import { Layout } from '../components/layout/Layout';
 import { OrdersTable } from '../components/orders/OrdersTable';
 import { OrdersFilter } from '../components/orders/OrdersFilter';
@@ -6,40 +7,92 @@ import { Filter, Download } from 'lucide-react';
 import { mockOrders } from '../data/mockOrders';
 import { clsx } from 'clsx';
 
+
 function Orders() {
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('All Orders');
 
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const response = await fetch('http://localhost:3001/api/orders');
+                const data = await response.json();
+                setOrders(data);
+            } catch (error) {
+                console.error('Failed to fetch orders:', error);
+                // Fallback to mock data if backend fails
+                setOrders(mockOrders);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchOrders();
+    }, []);
+
     const tabs = [
-        { name: 'All Orders', count: mockOrders.length },
-        { name: 'Pending', count: mockOrders.filter(o => o.status === 'Pending').length },
-        { name: 'Processing', count: mockOrders.filter(o => o.status === 'Processing').length },
-        { name: 'Completed', count: mockOrders.filter(o => o.status === 'Completed').length },
+        { name: 'All Orders', count: orders.length },
+        { name: 'Pending', count: orders.filter(o => o.status === 'Pending').length },
+        { name: 'Processing', count: orders.filter(o => o.status === 'Processing').length },
+        { name: 'Completed', count: orders.filter(o => o.status === 'Completed').length },
     ];
 
     const filteredOrders = activeTab === 'All Orders'
-        ? mockOrders
-        : mockOrders.filter(order => order.status === activeTab);
+        ? orders
+        : orders.filter(order => order.status === activeTab);
+
+    const handleExport = () => {
+        const headers = ['Order ID', 'Customer Name', 'Customer Email', 'Service', 'Pickup', 'Delivery', 'Amount', 'Status', 'Payment'];
+        const csvContent = [
+            headers.join(','),
+            ...orders.map(order => [
+                order.id,
+                `"${order.customer.name}"`,
+                order.customer.email,
+                `"${order.service.name}"`,
+                order.date.pickup,
+                order.date.delivery,
+                order.amount.replace('$', ''),
+                order.status,
+                order.payment
+            ].join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'orders_export.csv');
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
     return (
         <Layout>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Orders Management</h1>
-                    <p className="text-slate-500 text-sm mt-1">Manage and track all laundry service orders</p>
+                    <h1 className="text-2xl font-bold text-slate-100">Orders Management</h1>
+                    <p className="text-slate-400 text-sm mt-1">Manage and track all laundry service orders</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors">
+                    <button className="flex items-center gap-2 px-4 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-300 text-sm font-medium hover:bg-slate-800 transition-colors">
                         <Filter className="w-4 h-4" />
                         <span>Filter</span>
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors">
+                    <button
+                        onClick={handleExport}
+                        className="flex items-center gap-2 px-4 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-300 text-sm font-medium hover:bg-slate-800 transition-colors"
+                    >
                         <Download className="w-4 h-4" />
                         <span>Export</span>
                     </button>
                 </div>
             </div>
 
-            <div className="flex items-center gap-8 border-b border-slate-200 mb-6">
+            <div className="flex items-center gap-8 border-b border-slate-800 mb-6 overflow-x-auto no-scrollbar">
                 {tabs.map((tab) => (
                     <button
                         key={tab.name}
@@ -47,21 +100,21 @@ function Orders() {
                         className={clsx(
                             "pb-3 text-sm font-medium transition-all relative",
                             activeTab === tab.name
-                                ? "text-cyan-700"
-                                : "text-slate-500 hover:text-slate-700"
+                                ? "text-cyan-400"
+                                : "text-slate-400 hover:text-slate-200"
                         )}
                     >
                         {tab.name}
                         <span className={clsx(
                             "ml-2 text-xs py-0.5 px-2 rounded-full",
                             activeTab === tab.name
-                                ? "bg-cyan-50 text-cyan-700"
-                                : "bg-slate-100 text-slate-500"
+                                ? "bg-cyan-400/10 text-cyan-400"
+                                : "bg-slate-800 text-slate-400"
                         )}>
                             {tab.count}
                         </span>
                         {activeTab === tab.name && (
-                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-700 rounded-t-full" />
+                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-400 rounded-t-full" />
                         )}
                     </button>
                 ))}
@@ -71,7 +124,11 @@ function Orders() {
                 <OrdersFilter />
             </div>
 
-            <OrdersTable orders={filteredOrders} />
+            {isLoading ? (
+                <div className="glass-panel p-8 text-center text-slate-400">Loading orders...</div>
+            ) : (
+                <OrdersTable orders={filteredOrders} />
+            )}
         </Layout>
     );
 }

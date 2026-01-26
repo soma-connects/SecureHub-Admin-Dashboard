@@ -1,3 +1,25 @@
+export interface Order {
+    id: string;
+    customer: {
+        name: string;
+        email: string;
+        phone?: string;
+        address?: string;
+    };
+    service: {
+        name: string;
+        items: number;
+        category?: string;
+    };
+    date: {
+        pickup: string;
+        delivery: string;
+    };
+    amount: string;
+    status: 'Pending' | 'Processing' | 'Ready' | 'Completed' | 'Cancelled';
+    payment: 'Paid' | 'Unpaid' | 'Refunded';
+}
+
 export interface Office {
     id: string;
     name: string;
@@ -12,7 +34,7 @@ export interface Office {
     closeTime: string;
     manager: string;
     totalOrders: number;
-    isOpen?: boolean;
+    isOpen: boolean;
     lat?: string;
     lng?: string;
 }
@@ -28,4 +50,18 @@ export interface Service {
     createdDate: string;
     description: string;
     status: 'Active' | 'Inactive'; // inferred
+}
+
+export interface Customer {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+    orders: number;
+    spent: string;
+    lastOrder: string;
+    status: 'Active' | 'Inactive' | 'Vip';
+    initials: string;
+    color: string;
 }
