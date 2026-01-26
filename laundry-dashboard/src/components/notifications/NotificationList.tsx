@@ -1,91 +1,57 @@
 import { Search } from 'lucide-react';
 import { NotificationItem } from './NotificationItem';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
-const notifications = [
-    {
-        id: '1',
-        type: 'order_request' as const,
-        title: 'New Order Request',
-        priority: 'high' as const,
-        message: 'New order #ORD-1240 has been placed by Sarah Williams for Wash & Fold service',
-        orderId: '#ORD-1240',
-        customer: 'Sarah Williams',
-        timeAgo: '12 hours ago',
-        isUnread: true
-    },
-    {
-        id: '2',
-        type: 'payment_received' as const,
-        title: 'Payment Received',
-        priority: 'medium' as const,
-        message: 'Payment of $45.00 received for order #ORD-1235 from Jane Smith',
-        orderId: '#ORD-1235',
-        customer: 'Jane Smith',
-        amount: '$45.00',
-        timeAgo: '13 hours ago',
-        isUnread: true
-    },
-    {
-        id: '3',
-        type: 'payment_received' as const,
-        title: 'Payment Received',
-        priority: 'medium' as const,
-        message: 'Payment of $25.00 received for order #ORD-1234 from John Doe',
-        orderId: '#ORD-1234',
-        customer: 'John Doe',
-        amount: '$25.00',
-        timeAgo: '1 days ago',
-        isUnread: true
-    },
-    {
-        id: '4',
-        type: 'order_cancelled' as const,
-        title: 'Order Cancelled',
-        priority: 'high' as const,
-        message: 'Order #ORD-1230 cancelled due to unavailability of requested service',
-        orderId: '#ORD-1230',
-        customer: 'Robert Lee',
-        timeAgo: '1 days ago',
-        isUnread: false
-    },
-    {
-        id: '5',
-        type: 'refund_processed' as const,
-        title: 'Refund Processed',
-        priority: 'medium' as const,
-        message: 'Refund of $15.00 sent for cancelled order #ORD-1230',
-        orderId: '#ORD-1230',
-        customer: 'Robert Lee',
-        amount: '$15.00',
-        timeAgo: '1 days ago',
-        isUnread: false
-    },
-    {
-        id: '6',
-        type: 'order_in_progress' as const,
-        title: 'Order In Progress',
-        priority: 'low' as const,
-        message: 'Order #ORD-1240 pickup completed - now processing at facility',
-        orderId: '#ORD-1240',
-        customer: 'Sarah Williams',
-        timeAgo: '12 hours ago',
-        isUnread: true
-    }
-];
+interface NotificationListProps {
+    notifications: any[];
+}
 
-export function NotificationList() {
+export function NotificationList({ notifications }: NotificationListProps) {
+    const [activeTab, setActiveTab] = useState('all');
+    const [searchQuery, setSearchQuery] = useState('');
+
     const tabs = [
-        { id: 'all', label: 'All', count: 15 },
-        { id: 'unread', label: 'Unread', count: 5 },
-        { id: 'order_requests', label: 'Order Requests', count: 3 },
-        { id: 'in_progress', label: 'In Progress', count: 3 },
-        { id: 'completed', label: 'Completed', count: 2 },
-        { id: 'cancelled', label: 'Cancelled', count: 2 },
-        { id: 'payments', label: 'Payments', count: 5 },
+        { id: 'all', label: 'All' },
+        { id: 'unread', label: 'Unread' },
+        { id: 'order_request', label: 'Order Requests' },
+        { id: 'in_progress', label: 'In Progress' },
+        { id: 'completed', label: 'Completed' },
+        { id: 'cancelled', label: 'Cancelled' },
+        { id: 'payment_received', label: 'Payments' },
     ];
 
-    const [activeTab, setActiveTab] = useState('all');
+    const filteredNotifications = useMemo(() => {
+        return notifications.filter(notification => {
+            // Tab filter
+            if (activeTab === 'unread' && !notification.isUnread) return false;
+            if (activeTab !== 'all' && activeTab !== 'unread' && notification.type !== activeTab) return false;
+
+            // Search filter
+            if (searchQuery) {
+                const query = searchQuery.toLowerCase();
+                return (
+                    notification.orderId?.toLowerCase().includes(query) ||
+                    notification.customer?.toLowerCase().includes(query) ||
+                    notification.message?.toLowerCase().includes(query)
+                );
+            }
+
+            return true;
+        });
+    }, [notifications, activeTab, searchQuery]);
+
+    // Calculate counts for tabs
+    const counts = useMemo(() => {
+        const acc: Record<string, number> = {};
+        tabs.forEach(tab => acc[tab.id] = 0);
+
+        notifications.forEach(n => {
+            acc['all']++;
+            if (n.isUnread) acc['unread']++;
+            if (acc[n.type] !== undefined) acc[n.type]++;
+        });
+        return acc;
+    }, [notifications]);
 
     return (
         <div>
@@ -96,12 +62,14 @@ export function NotificationList() {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`text-sm font-medium pb-1 border-b-2 transition-colors flex items-center gap-1 ${activeTab === tab.id
-                                ? 'text-blue-600 border-blue-600'
-                                : 'text-slate-500 border-transparent hover:text-slate-700'
+                                ? 'text-cyan-400 border-cyan-400'
+                                : 'text-slate-400 border-transparent hover:text-slate-200'
                                 }`}
                         >
                             {tab.label}
-                            <span className="text-xs bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full ml-1">({tab.count})</span>
+                            <span className={`text-xs px-1.5 py-0.5 rounded-full ml-1 ${activeTab === tab.id ? 'bg-cyan-400/10 text-cyan-400' : 'bg-slate-800 text-slate-400'}`}>
+                                ({counts[tab.id] || 0})
+                            </span>
                         </button>
                     ))}
                 </div>
@@ -113,24 +81,32 @@ export function NotificationList() {
                     <input
                         type="text"
                         placeholder="Search notifications by order ID, customer, or message..."
-                        className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-11 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-xl text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 shadow-sm placeholder-slate-500"
                     />
                 </div>
             </div>
 
             <div className="space-y-4">
-                {notifications.map((notification) => (
-                    <NotificationItem key={notification.id} {...notification} />
-                ))}
+                {filteredNotifications.length > 0 ? (
+                    filteredNotifications.map((notification) => (
+                        <NotificationItem key={notification.id} {...notification} />
+                    ))
+                ) : (
+                    <div className="text-center py-12 text-slate-400">
+                        No notifications found matching your criteria.
+                    </div>
+                )}
             </div>
 
-            <div className="flex items-center justify-between border-t border-slate-200 pt-6 mt-8">
-                <p className="text-sm text-slate-500">Showing {notifications.length} of 15 notifications</p>
+            <div className="flex items-center justify-between border-t border-slate-800 pt-6 mt-8">
+                <p className="text-sm text-slate-400">Showing {filteredNotifications.length} of {notifications.length} notifications</p>
+                {/* Pagination (Visual only for now as we have full list) */}
                 <div className="flex gap-2">
-                    <button className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50">Previous</button>
+                    <button className="px-4 py-2 border border-slate-700 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 transition-colors" disabled>Previous</button>
                     <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm shadow-blue-600/20">1</button>
-                    <button className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50">2</button>
-                    <button className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50">Next</button>
+                    <button className="px-4 py-2 border border-slate-700 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 transition-colors">Next</button>
                 </div>
             </div>
         </div>

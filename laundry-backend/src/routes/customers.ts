@@ -1,18 +1,8 @@
-import { Router, Request, Response } from 'express';
-import { supabase } from '../config/supabase';
+import { Router } from 'express';
+import * as customerController from '../controllers/customerController';
 
 const router = Router();
 
-// Get all customers (users)
-router.get('/', async (req: Request, res: Response) => {
-    const { data, error } = await supabase
-        .from('users')
-        .select('*');
-
-    if (error) {
-        return res.status(500).json({ error: error.message });
-    }
-    res.json(data);
-});
+router.get('/', customerController.getCustomers);
 
 export default router;
