@@ -6,9 +6,10 @@ import type { Order } from '../../data/mockOrders';
 
 interface OrdersTableProps {
     orders: Order[];
+    onRefresh: () => void;
 }
 
-export function OrdersTable({ orders }: OrdersTableProps) {
+export function OrdersTable({ orders, onRefresh }: OrdersTableProps) {
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
@@ -36,11 +37,41 @@ export function OrdersTable({ orders }: OrdersTableProps) {
         setOpenDropdownId(openDropdownId === id ? null : id);
     };
 
+
+    const handleAction = async (orderId: string, action: 'status' | 'delete', value?: string) => {
+        try {
+            if (action === 'delete') {
+                if (!confirm('Are you sure you want to delete this order?')) return;
+
+                const response = await fetch(`http://localhost:3001/api/orders/${orderId}`, {
+                    method: 'DELETE',
+                });
+
+                if (!response.ok) throw new Error('Failed to delete order');
+            } else if (action === 'status' && value) {
+                const response = await fetch(`http://localhost:3001/api/orders/${orderId}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: value }),
+                });
+
+                if (!response.ok) throw new Error('Failed to update status');
+            }
+
+            setOpenDropdownId(null);
+            onRefresh();
+        } catch (error) {
+            console.error('Action failed:', error);
+            alert('Action failed. Please try again.');
+        }
+    };
+
     return (
         <>
             <div className="glass-card rounded-xl border border-slate-800 overflow-hidden pb-20"> {/* pb-20 for dropdown space */}
                 <div className="overflow-x-auto">
                     <table className="w-full">
+                        {/* ... table header ... */}
                         <thead>
                             <tr className="bg-slate-900/50 border-b border-slate-800">
                                 <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Order ID</th>
@@ -111,7 +142,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
                                                         {order.status === 'Pending' && (
                                                             <button
                                                                 className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 flex items-center gap-2"
-                                                                onClick={() => alert(`Processing order ${order.id}`)}
+                                                                onClick={() => handleAction(order.id, 'status', 'Processing')}
                                                             >
                                                                 <CheckCircle className="w-4 h-4 text-blue-500" />
                                                                 Start Processing
@@ -120,7 +151,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
                                                         {order.status === 'Processing' && (
                                                             <button
                                                                 className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 flex items-center gap-2"
-                                                                onClick={() => alert(`Marking order ${order.id} as ready`)}
+                                                                onClick={() => handleAction(order.id, 'status', 'Ready')}
                                                             >
                                                                 <CheckCircle className="w-4 h-4 text-emerald-500" />
                                                                 Mark as Ready
@@ -129,7 +160,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
                                                         {order.status === 'Ready' && (
                                                             <button
                                                                 className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 flex items-center gap-2"
-                                                                onClick={() => alert(`Completing order ${order.id}`)}
+                                                                onClick={() => handleAction(order.id, 'status', 'Completed')}
                                                             >
                                                                 <CheckCircle className="w-4 h-4 text-emerald-500" />
                                                                 Complete Order
@@ -138,7 +169,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
                                                         {['Pending', 'Processing', 'Ready'].includes(order.status) && (
                                                             <button
                                                                 className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 flex items-center gap-2"
-                                                                onClick={() => alert(`Cancelling order ${order.id}`)}
+                                                                onClick={() => handleAction(order.id, 'status', 'Cancelled')}
                                                             >
                                                                 <XCircle className="w-4 h-4 text-amber-500" />
                                                                 Cancel Order
@@ -147,7 +178,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
                                                         {(order.status === 'Completed' || order.status === 'Cancelled') && (
                                                             <button
                                                                 className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-500/10 flex items-center gap-2"
-                                                                onClick={() => alert(`Deleting order ${order.id}`)}
+                                                                onClick={() => handleAction(order.id, 'delete')}
                                                             >
                                                                 <Trash2 className="w-4 h-4" />
                                                                 Delete Order

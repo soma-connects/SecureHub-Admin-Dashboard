@@ -26,27 +26,19 @@ export function OfficeMapModal({ isOpen, onClose, office }: OfficeMapModalProps)
                     </button>
                 </div>
 
-                {/* Mock Map View */}
-                <div className="h-64 bg-slate-50 relative border-b border-slate-100">
-                    <div className="absolute inset-0 grid grid-cols-12 grid-rows-6 pointer-events-none opacity-10">
-                        {Array.from({ length: 72 }).map((_, i) => (
-                            <div key={i} className="border border-slate-300"></div>
-                        ))}
-                    </div>
-
-                    {/* Map Center Pin */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-                        <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center shadow-lg shadow-blue-600/30 animate-bounce">
-                            <MapPin className="text-white w-6 h-6" />
-                        </div>
-                        <div className="w-4 h-2 bg-black/20 rounded-full blur-sm mt-1"></div>
-                    </div>
-
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white px-4 py-2 rounded-lg shadow-md border border-slate-100 text-center">
-                        <p className="text-xs font-bold text-slate-900">{office.name}</p>
-                        <p className="text-[10px] text-slate-500">{office.address}</p>
-                        <p className="text-[10px] text-blue-500 mt-0.5">Lat: {office.lat} Lng: {office.lng}</p>
-                    </div>
+                {/* Google Map Embed */}
+                <div className="h-64 bg-slate-100 relative border-b border-slate-200">
+                    <iframe
+                        width="100%"
+                        height="100%"
+                        frameBorder="0"
+                        title="Office Location"
+                        scrolling="no"
+                        marginHeight={0}
+                        marginWidth={0}
+                        src={`https://maps.google.com/maps?q=${office.lat},${office.lng}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                        className="w-full h-full"
+                    ></iframe>
                 </div>
 
                 <div className="p-6 grid grid-cols-2 gap-4">

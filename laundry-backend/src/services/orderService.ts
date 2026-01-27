@@ -32,3 +32,14 @@ export const updateOrderStatus = async (id: string, status: string) => {
 
     return data;
 };
+
+export const deleteOrder = async (id: string) => {
+    const { error } = await supabase
+        .from('orders')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        throw new AppError(error.message, 500);
+    }
+};

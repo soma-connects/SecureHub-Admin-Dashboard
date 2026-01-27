@@ -13,21 +13,21 @@ function Orders() {
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('All Orders');
 
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const response = await fetch('http://localhost:3001/api/orders');
-                const data = await response.json();
-                setOrders(data);
-            } catch (error) {
-                console.error('Failed to fetch orders:', error);
-                // Fallback to mock data if backend fails
-                setOrders(mockOrders);
-            } finally {
-                setIsLoading(false);
-            }
-        };
+    const fetchOrders = async () => {
+        try {
+            const response = await fetch('http://localhost:3001/api/orders');
+            const data = await response.json();
+            setOrders(data);
+        } catch (error) {
+            console.error('Failed to fetch orders:', error);
+            // Fallback to mock data if backend fails
+            setOrders(mockOrders);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchOrders();
     }, []);
 
@@ -127,7 +127,7 @@ function Orders() {
             {isLoading ? (
                 <div className="glass-panel p-8 text-center text-slate-400">Loading orders...</div>
             ) : (
-                <OrdersTable orders={filteredOrders} />
+                <OrdersTable orders={filteredOrders} onRefresh={fetchOrders} />
             )}
         </Layout>
     );

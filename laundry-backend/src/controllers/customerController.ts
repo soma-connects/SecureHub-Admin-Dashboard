@@ -37,3 +37,9 @@ export const getCustomers = asyncHandler(async (req: Request, res: Response) => 
 
     res.status(200).json(customers);
 });
+
+export const deleteCustomer = asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params as { id: string };
+    await customerService.deleteCustomer(id);
+    res.status(204).send();
+});

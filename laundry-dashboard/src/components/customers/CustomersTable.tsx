@@ -1,26 +1,43 @@
 import { useState, useEffect } from 'react';
-import { MoreVertical, Mail, Phone, MapPin, Eye, Filter, Download, Search, ShoppingBag } from 'lucide-react';
+import { Mail, Phone, MapPin, Eye, Filter, Download, Search, ShoppingBag, Trash2 } from 'lucide-react';
 import type { Customer } from '../../types';
 
 export function CustomersTable() {
     const [customers, setCustomers] = useState<Customer[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchCustomers = async () => {
-            try {
-                const response = await fetch('http://localhost:3001/api/customers');
-                const data = await response.json();
-                setCustomers(data);
-            } catch (error) {
-                console.error('Failed to fetch customers:', error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
+    const fetchCustomers = async () => {
+        try {
+            const response = await fetch('http://localhost:3001/api/customers');
+            const data = await response.json();
+            setCustomers(data);
+        } catch (error) {
+            console.error('Failed to fetch customers:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchCustomers();
     }, []);
+
+    const handleDelete = async (id: string, name: string) => {
+        if (!confirm(`Are you sure you want to delete customer "${name}"? This cannot be undone.`)) return;
+
+        try {
+            const response = await fetch(`http://localhost:3001/api/customers/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) throw new Error('Failed to delete customer');
+
+            fetchCustomers();
+        } catch (error) {
+            console.error('Delete failed:', error);
+            alert('Failed to delete customer. Please try again.');
+        }
+    };
 
     if (isLoading) {
         return <div className="p-8 text-center text-slate-500">Loading customers...</div>;
@@ -120,8 +137,12 @@ export function CustomersTable() {
                                             <button className="text-slate-400 hover:text-blue-400 transition-colors p-1.5 rounded-lg hover:bg-blue-500/10" title="View Details">
                                                 <Eye className="w-4 h-4" />
                                             </button>
-                                            <button className="text-slate-400 hover:text-slate-200 transition-colors p-1.5 rounded-lg hover:bg-slate-800" title="More Options">
-                                                <MoreVertical className="w-4 h-4" />
+                                            <button
+                                                className="text-slate-400 hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-red-500/10"
+                                                title="Delete Customer"
+                                                onClick={() => handleDelete(customer.id, customer.name)}
+                                            >
+                                                <Trash2 className="w-4 h-4" />
                                             </button>
                                         </div>
                                     </td>

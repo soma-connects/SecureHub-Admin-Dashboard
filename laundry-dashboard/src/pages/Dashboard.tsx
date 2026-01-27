@@ -53,7 +53,7 @@ function Dashboard() {
             <div className="mb-8">
                 <div className="mb-6">
                     <h2 className="text-2xl font-bold text-slate-100">Command Center</h2>
-                    <p className="text-slate-400 text-sm">System Overview & Microservices Health</p>
+                    <p className="text-slate-400 text-sm">System Overview</p>
                 </div>
 
                 {/* KPI Stats */}
@@ -96,7 +96,7 @@ function Dashboard() {
                     />
                 </div>
 
-                {/* Microservices Health Grid */}
+                {/* Microservices Health Grid - HIDDEN
                 <div className="mb-8">
                     <h3 className="text-slate-200 font-semibold mb-4 text-lg">Microservices Status</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -130,6 +130,7 @@ function Dashboard() {
                         />
                     </div>
                 </div>
+                */}
 
                 {/* Observability Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">

@@ -12,3 +12,14 @@ export const getAllCustomers = async () => {
 
     return data;
 };
+
+export const deleteCustomer = async (id: string) => {
+    const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        throw new AppError(error.message, 500);
+    }
+};
