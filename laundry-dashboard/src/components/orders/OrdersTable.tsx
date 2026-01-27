@@ -37,11 +37,10 @@ export function OrdersTable({ orders, onRefresh }: OrdersTableProps) {
         setOpenDropdownId(openDropdownId === id ? null : id);
     };
 
-
     const handleAction = async (orderId: string, action: 'status' | 'delete', value?: string) => {
         try {
             if (action === 'delete') {
-                if (!confirm('Are you sure you want to delete this order?')) return;
+                if (!window.confirm('Are you sure you want to delete this order?')) return;
 
                 const response = await fetch(`http://localhost:3001/api/orders/${orderId}`, {
                     method: 'DELETE',
@@ -62,7 +61,7 @@ export function OrdersTable({ orders, onRefresh }: OrdersTableProps) {
             onRefresh();
         } catch (error) {
             console.error('Action failed:', error);
-            alert('Action failed. Please try again.');
+            window.alert('Action failed. Please try again.');
         }
     };
 
@@ -71,7 +70,6 @@ export function OrdersTable({ orders, onRefresh }: OrdersTableProps) {
             <div className="glass-card rounded-xl border border-slate-800 overflow-hidden pb-20"> {/* pb-20 for dropdown space */}
                 <div className="overflow-x-auto">
                     <table className="w-full">
-                        {/* ... table header ... */}
                         <thead>
                             <tr className="bg-slate-900/50 border-b border-slate-800">
                                 <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Order ID</th>
