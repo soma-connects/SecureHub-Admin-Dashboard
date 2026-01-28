@@ -1,11 +1,26 @@
+import { useState, useEffect } from 'react';
+
 export function RecentOrders() {
-    const orders = [
-        { id: '#ORD-001', customer: 'Sarah Johnson', services: 'Dry Cleaning', total: '$45.00', status: 'Processing' },
-        { id: '#ORD-002', customer: 'Michael Chen', services: 'Wash & Fold', total: '$22.50', status: 'Completed' },
-        { id: '#ORD-003', customer: 'Emma Wilson', services: 'Ironing', total: '$15.00', status: 'Pending' },
-        { id: '#ORD-004', customer: 'James Brown', services: 'Dry Cleaning', total: '$60.00', status: 'Processing' },
-        { id: '#ORD-005', customer: 'Sofia Garcia', services: 'Wash & Fold', total: '$35.00', status: 'Completed' },
-    ];
+    const [orders, setOrders] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const response = await fetch('http://localhost:3001/api/orders');
+                const data = await response.json();
+                // Take only the last 5 orders or top 5 depending on sorting. 
+                // Assuming API returns all, we might want to slice.
+                setOrders(data.slice(0, 5));
+            } catch (error) {
+                console.error('Failed to fetch recent orders:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchOrders();
+    }, []);
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -16,6 +31,10 @@ export function RecentOrders() {
             default: return 'bg-slate-100 text-slate-700';
         }
     };
+
+    if (isLoading) {
+        return <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex justify-center text-slate-400">Loading recent orders...</div>;
+    }
 
     return (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
@@ -38,9 +57,9 @@ export function RecentOrders() {
                         {orders.map((order) => (
                             <tr key={order.id} className="hover:bg-slate-50/50 transition-colors">
                                 <td className="px-6 py-4 text-sm font-medium text-slate-900">{order.id}</td>
-                                <td className="px-6 py-4 text-sm text-slate-600">{order.customer}</td>
-                                <td className="px-6 py-4 text-sm text-slate-600">{order.services}</td>
-                                <td className="px-6 py-4 text-sm font-semibold text-slate-900">{order.total}</td>
+                                <td className="px-6 py-4 text-sm text-slate-600">{order.customer.name}</td>
+                                <td className="px-6 py-4 text-sm text-slate-600">{order.service.name}</td>
+                                <td className="px-6 py-4 text-sm font-semibold text-slate-900">{order.amount}</td>
                                 <td className="px-6 py-4">
                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
                                         {order.status}
