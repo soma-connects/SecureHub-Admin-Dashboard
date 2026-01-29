@@ -4,7 +4,19 @@ import { AppError } from '../utils/AppError';
 export const getAllOrders = async () => {
     const { data, error } = await supabase
         .from('orders')
-        .select('*')
+        .select(`
+            *,
+            customer:customers (
+                name,
+                email,
+                phone,
+                address
+            ),
+            service:services (
+                name,
+                category
+            )
+        `)
         .order('created_at', { ascending: false });
 
     if (error) {

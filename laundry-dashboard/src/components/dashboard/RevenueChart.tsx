@@ -7,11 +7,8 @@ interface RevenueChartProps {
 }
 
 export function RevenueChart({ data }: RevenueChartProps) {
-    // Default valid mock data if loading/empty
-    const chartData = data && data.length > 0 ? data : [
-        { name: 'Mon', value: 0 },
-        { name: 'Tue', value: 0 },
-    ];
+    // Use provided data or empty array
+    const chartData = data || [];
     return (
         <div className="glass-card p-6 rounded-2xl border border-slate-800 h-full">
             <div className="mb-6">

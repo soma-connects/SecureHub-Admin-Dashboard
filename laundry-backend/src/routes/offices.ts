@@ -3,6 +3,7 @@ import * as officeController from '../controllers/officeController';
 
 const router = Router();
 
+router.get('/stats', officeController.getStats);
 router.get('/', officeController.getOffices);
 router.post('/', officeController.createOffice);
 router.put('/:id', officeController.updateOffice);

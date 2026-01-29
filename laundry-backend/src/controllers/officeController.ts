@@ -23,3 +23,8 @@ export const deleteOffice = asyncHandler(async (req: Request, res: Response) => 
     await officeService.deleteOffice(id);
     res.status(204).send();
 });
+
+export const getStats = asyncHandler(async (req: Request, res: Response) => {
+    const stats = await officeService.getOfficeStats();
+    res.status(200).json(stats);
+});

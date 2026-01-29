@@ -43,3 +43,45 @@ export const deleteCustomer = asyncHandler(async (req: Request, res: Response) =
     await customerService.deleteCustomer(id);
     res.status(204).send();
 });
+
+export const getCustomer = asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params as { id: string };
+    const customer = await customerService.getCustomerById(id);
+
+    // Format response if needed (similar to getCustomers mapping)
+    const formattedCustomer = {
+        id: customer.id,
+        name: customer.name,
+        email: customer.email,
+        phone: customer.phone,
+        address: customer.address,
+        orders: customer.orders,
+        spent: customer.spent,
+        lastOrder: customer.last_order,
+        status: customer.status,
+        initials: customer.initials,
+        color: customer.color,
+        recentOrders: customer.recentOrders.map((o: any) => ({
+            id: o.id,
+            date: format(new Date(o.created_at), 'MMM dd, yyyy'),
+            amount: o.amount,
+            status: o.status,
+            service: o.service?.name || 'Unknown'
+        }))
+    };
+
+    res.status(200).json(formattedCustomer);
+});
+
+export const updateStatus = asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params as { id: string };
+    const { status } = req.body;
+
+    if (!['Active', 'Inactive'].includes(status)) {
+        res.status(400);
+        throw new Error('Invalid status. Must be Active or Inactive.');
+    }
+
+    await customerService.updateCustomerStatus(id, status);
+    res.status(200).json({ message: `Customer ${status}` });
+});

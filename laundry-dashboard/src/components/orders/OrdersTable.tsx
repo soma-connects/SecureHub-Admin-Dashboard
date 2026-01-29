@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { MoreVertical, Eye, Trash2, CheckCircle, XCircle } from 'lucide-react';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { OrderDetailsModal } from './OrderDetailsModal';
-import type { Order } from '../../data/mockOrders';
+import type { Order } from '../../types';
 
 interface OrdersTableProps {
     orders: Order[];

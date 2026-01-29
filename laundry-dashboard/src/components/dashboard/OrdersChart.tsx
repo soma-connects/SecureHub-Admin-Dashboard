@@ -7,10 +7,7 @@ interface OrdersChartProps {
 }
 
 export function OrdersChart({ data }: OrdersChartProps) {
-    const chartData = data && data.length > 0 ? data : [
-        { name: 'Mon', orders: 0 },
-        { name: 'Tue', orders: 0 },
-    ];
+    const chartData = data || [];
     return (
         <div className="glass-card p-6 rounded-2xl border border-slate-800 h-full">
             <div className="mb-6">

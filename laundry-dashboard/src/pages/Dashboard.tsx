@@ -2,11 +2,11 @@ import { Layout } from '../components/layout/Layout';
 import { StatCard } from '../components/dashboard/StatCard';
 import { RevenueChart } from '../components/dashboard/RevenueChart';
 import { OrdersChart } from '../components/dashboard/OrdersChart';
-import { ServiceHealthCard } from '../components/dashboard/ServiceHealthCard';
-import { SystemMetrics } from '../components/dashboard/SystemMetrics';
-import { LiveLogStream } from '../components/dashboard/LiveLogStream';
 import { DollarSign, ShoppingBag, Users, Clock } from 'lucide-react';
 import { useDateRange } from '../context/DateRangeContext';
+import { DateRangePicker } from '../components/common/DateRangePicker';
+import { RecentOrders } from '../components/dashboard/RecentOrders';
+import { ServiceDistribution } from '../components/dashboard/ServiceDistribution';
 import { useEffect, useState } from 'react';
 
 function Dashboard() {
@@ -17,7 +17,9 @@ function Dashboard() {
         activeCustomers: 0,
         pendingOrders: 0,
         revenueChart: [],
-        ordersChart: []
+        ordersChart: [],
+        recentOrders: [],
+        serviceDistribution: []
     });
     const [loading, setLoading] = useState(true);
 
@@ -51,9 +53,12 @@ function Dashboard() {
     return (
         <Layout>
             <div className="mb-8">
-                <div className="mb-6">
-                    <h2 className="text-2xl font-bold text-slate-100">Command Center</h2>
-                    <p className="text-slate-400 text-sm">System Overview</p>
+                <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 className="text-2xl font-bold text-slate-100">Command Center</h2>
+                        <p className="text-slate-400 text-sm">System Overview</p>
+                    </div>
+                    <DateRangePicker />
                 </div>
 
                 {/* KPI Stats */}
@@ -132,15 +137,7 @@ function Dashboard() {
                 </div>
                 */}
 
-                {/* Observability Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                    <div className="lg:col-span-2 h-[350px]">
-                        <SystemMetrics />
-                    </div>
-                    <div className="h-[350px]">
-                        <LiveLogStream />
-                    </div>
-                </div>
+                {/* Observability Section Removed - No real backend support */}
 
                 {/* Bottom Section: Charts */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -156,6 +153,24 @@ function Dashboard() {
                             <div className="h-[350px] glass-panel rounded-2xl animate-pulse bg-slate-800/50" />
                         ) : (
                             <OrdersChart data={stats.ordersChart} />
+                        )}
+                    </div>
+                </div>
+
+                {/* New Section: Recent Orders & Service Distribution */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2 h-[400px]">
+                        {loading ? (
+                            <div className="h-full glass-panel rounded-2xl animate-pulse bg-slate-800/50" />
+                        ) : (
+                            <RecentOrders orders={stats.recentOrders} />
+                        )}
+                    </div>
+                    <div className="h-[400px]">
+                        {loading ? (
+                            <div className="h-full glass-panel rounded-2xl animate-pulse bg-slate-800/50" />
+                        ) : (
+                            <ServiceDistribution data={stats.serviceDistribution} />
                         )}
                     </div>
                 </div>

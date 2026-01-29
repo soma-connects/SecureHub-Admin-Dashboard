@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Mail, Phone, MapPin, Eye, Filter, Download, Search, ShoppingBag, Trash2 } from 'lucide-react';
+import { Mail, Phone, MapPin, Eye, Filter, Download, Search, ShoppingBag, Trash2, Ban } from 'lucide-react';
 import type { Customer } from '../../types';
+import { CustomerDetailsModal } from './CustomerDetailsModal';
 
 export function CustomersTable() {
     const [customers, setCustomers] = useState<Customer[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+    const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
     const fetchCustomers = async () => {
         try {
@@ -22,6 +25,28 @@ export function CustomersTable() {
         fetchCustomers();
     }, []);
 
+    const handleSuspend = async (id: string, currentStatus: string, name: string) => {
+        const newStatus = currentStatus === 'Inactive' ? 'Active' : 'Inactive';
+        const action = currentStatus === 'Inactive' ? 'activate' : 'suspend';
+
+        if (!confirm(`Are you sure you want to ${action} customer "${name}"?`)) return;
+
+        try {
+            const response = await fetch(`http://localhost:3001/api/customers/${id}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus }),
+            });
+
+            if (!response.ok) throw new Error(`Failed to ${action} customer`);
+
+            fetchCustomers();
+        } catch (error) {
+            console.error('Status update failed:', error);
+            alert(`Failed to ${action} customer. Please try again.`);
+        }
+    };
+
     const handleDelete = async (id: string, name: string) => {
         if (!confirm(`Are you sure you want to delete customer "${name}"? This cannot be undone.`)) return;
 
@@ -37,6 +62,11 @@ export function CustomersTable() {
             console.error('Delete failed:', error);
             alert('Failed to delete customer. Please try again.');
         }
+    };
+
+    const handleViewDetails = (id: string) => {
+        setSelectedCustomerId(id);
+        setIsDetailsOpen(true);
     };
 
     if (isLoading) {
@@ -134,8 +164,19 @@ export function CustomersTable() {
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button className="text-slate-400 hover:text-blue-400 transition-colors p-1.5 rounded-lg hover:bg-blue-500/10" title="View Details">
+                                            <button
+                                                className="text-slate-400 hover:text-blue-400 transition-colors p-1.5 rounded-lg hover:bg-blue-500/10"
+                                                title="View Details"
+                                                onClick={() => handleViewDetails(customer.id)}
+                                            >
                                                 <Eye className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                className={`${customer.status === 'Inactive' ? 'text-amber-400 hover:text-emerald-400 hover:bg-emerald-500/10' : 'text-slate-400 hover:text-amber-400 hover:bg-amber-500/10'} transition-colors p-1.5 rounded-lg`}
+                                                title={customer.status === 'Inactive' ? "Activate Customer" : "Suspend Customer"}
+                                                onClick={() => handleSuspend(customer.id, customer.status, customer.name)}
+                                            >
+                                                <Ban className="w-4 h-4" />
                                             </button>
                                             <button
                                                 className="text-slate-400 hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-red-500/10"
@@ -151,16 +192,22 @@ export function CustomersTable() {
                         </tbody>
                     </table>
                 </div>
+                {/* ... pagination ... */}
                 <div className="px-6 py-4 border-t border-slate-800 flex flex-col md:flex-row gap-4 items-center justify-between">
-                    <p className="text-sm text-slate-500">Showing 8 of 8 customers</p>
+                    <p className="text-sm text-slate-500">Showing {customers.length} customers</p>
                     <div className="flex gap-2">
                         <button className="px-4 py-2 border border-slate-700 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors">Previous</button>
                         <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm shadow-blue-600/20 transition-colors">1</button>
-                        <button className="px-4 py-2 border border-slate-700 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors">2</button>
                         <button className="px-4 py-2 border border-slate-700 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors">Next</button>
                     </div>
                 </div>
             </div>
+
+            <CustomerDetailsModal
+                isOpen={isDetailsOpen}
+                onClose={() => setIsDetailsOpen(false)}
+                customerId={selectedCustomerId}
+            />
         </div>
     );
 }

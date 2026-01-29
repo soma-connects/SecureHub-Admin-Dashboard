@@ -117,3 +117,24 @@ export const deleteOffice = async (id: string) => {
         throw new AppError(error.message, 500);
     }
 };
+
+export const getOfficeStats = async () => {
+    const { count: total, error: totalError } = await supabase
+        .from('offices')
+        .select('*', { count: 'exact', head: true });
+
+    const { count: active, error: activeError } = await supabase
+        .from('offices')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_open', true);
+
+    if (totalError || activeError) {
+        throw new AppError('Failed to fetch office stats', 500);
+    }
+
+    return {
+        total: total || 0,
+        active: active || 0,
+        inactive: (total || 0) - (active || 0)
+    };
+};

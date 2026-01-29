@@ -4,7 +4,6 @@ import { Layout } from '../components/layout/Layout';
 import { OrdersTable } from '../components/orders/OrdersTable';
 import { OrdersFilter } from '../components/orders/OrdersFilter';
 import { Filter, Download } from 'lucide-react';
-import { mockOrders } from '../data/mockOrders';
 import { clsx } from 'clsx';
 
 
@@ -20,8 +19,8 @@ function Orders() {
             setOrders(data);
         } catch (error) {
             console.error('Failed to fetch orders:', error);
-            // Fallback to mock data if backend fails
-            setOrders(mockOrders);
+            // Handle error state gracefully without mocks
+            setOrders([]);
         } finally {
             setIsLoading(false);
         }

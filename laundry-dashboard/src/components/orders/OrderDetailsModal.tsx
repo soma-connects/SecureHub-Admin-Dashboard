@@ -1,5 +1,5 @@
 import { X, User, ShoppingBag, Calendar, CreditCard, CheckCircle } from 'lucide-react';
-import type { Order } from '../../data/mockOrders';
+import type { Order } from '../../types';
 import { clsx } from 'clsx';
 import { OrderStatusBadge } from './OrderStatusBadge';
 
