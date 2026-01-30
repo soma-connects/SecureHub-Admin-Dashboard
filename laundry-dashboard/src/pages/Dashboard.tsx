@@ -139,18 +139,22 @@ function Dashboard() {
 
                 {/* Bottom Section: Charts */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-2">
+                    <div className="lg:col-span-2 h-[350px]">
                         {loading ? (
-                            <div className="h-[350px] glass-panel rounded-2xl animate-pulse bg-slate-800/50" />
+                            <div className="h-full glass-panel rounded-2xl animate-pulse bg-slate-800/50" />
                         ) : (
-                            <RevenueChart data={stats.revenueChart} />
+                            <div className="h-full w-full">
+                                <RevenueChart data={stats.revenueChart} />
+                            </div>
                         )}
                     </div>
-                    <div>
+                    <div className="h-[350px]">
                         {loading ? (
-                            <div className="h-[350px] glass-panel rounded-2xl animate-pulse bg-slate-800/50" />
+                            <div className="h-full glass-panel rounded-2xl animate-pulse bg-slate-800/50" />
                         ) : (
-                            <OrdersChart data={stats.ordersChart} />
+                            <div className="h-full w-full">
+                                <OrdersChart data={stats.ordersChart} />
+                            </div>
                         )}
                     </div>
                 </div>
@@ -168,7 +172,9 @@ function Dashboard() {
                         {loading ? (
                             <div className="h-full glass-panel rounded-2xl animate-pulse bg-slate-800/50" />
                         ) : (
-                            <ServiceDistribution data={stats.serviceDistribution} />
+                            <div className="h-full w-full">
+                                <ServiceDistribution data={stats.serviceDistribution} />
+                            </div>
                         )}
                     </div>
                 </div>

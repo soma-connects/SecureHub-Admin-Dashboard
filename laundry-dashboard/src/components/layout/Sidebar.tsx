@@ -5,10 +5,12 @@ import {
     Settings,
     MapPin,
     Bell,
-    Shirt
+    Shirt,
+    LogOut
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -17,7 +19,7 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
     const location = useLocation();
-
+    const { user, logout } = useAuth();
 
     const navItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
@@ -80,12 +82,19 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <div className="mt-auto p-6 border-t border-slate-800/50">
                     <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800/30 border border-slate-700/30 mb-4">
                         <div className="w-8 h-8 rounded-full bg-violet-500/20 border border-violet-500/30 flex items-center justify-center text-violet-300 font-bold text-sm">
-                            AD
+                            {(user?.name || 'AD').substring(0, 2).toUpperCase()}
                         </div>
                         <div className="flex-1 overflow-hidden">
-                            <p className="text-sm font-semibold text-slate-200 truncate">Admin User</p>
-                            <p className="text-xs text-slate-500 truncate">admin@laundryhub.com</p>
+                            <p className="text-sm font-semibold text-slate-200 truncate">{user?.name || 'Admin User'}</p>
+                            <p className="text-xs text-slate-500 truncate">{user?.email || 'admin@laundryhub.com'}</p>
                         </div>
+                        <button
+                            onClick={logout}
+                            className="p-1.5 hover:bg-slate-700/50 rounded-lg text-slate-400 hover:text-rose-400 transition-colors"
+                            title="Sign Out"
+                        >
+                            <LogOut className="w-4 h-4" />
+                        </button>
                     </div>
                 </div>
             </aside>

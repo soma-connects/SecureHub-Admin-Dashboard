@@ -169,15 +169,45 @@ async function seed() {
     // 1. Users
     console.log('Inserting Users...');
     for (const u of users) {
-        // Users table seems to lack password column. Using email/name only.
+        let userId = u.id; // Default to hardcoded
+
+        // Try to create auth user
+        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+            email: u.email,
+            password: u.password,
+            email_confirm: true,
+            user_metadata: { name: u.name, role: u.role }
+        });
+
+        if (authError) {
+            console.log(`Auth user creation note (${u.email}): ${authError.message}`);
+            // If user exists, we need their ID to link consistently
+            if (authError.message.includes('already registered') || authError.status === 422) {
+                // Unfortunately admin API doesn't have getUserByEmail easily exposed in all versions, 
+                // but listUsers can find it.
+                const { data: listData } = await supabase.auth.admin.listUsers();
+                const existingUser = listData.users.find(user => user.email === u.email);
+                if (existingUser) {
+                    userId = existingUser.id;
+                    console.log(`Found existing auth user ID: ${userId}`);
+                }
+            }
+        } else if (authData.user) {
+            userId = authData.user.id;
+            console.log(`Created new auth user ID: ${userId}`);
+        }
+
+        // Clean up public.users to avoid ID/Email mismatch conflicts
+        await supabase.from('users').delete().eq('email', u.email);
+
         const dbUser = {
-            id: u.id,
+            id: userId,
             email: u.email,
             name: u.name,
             role: u.role
         };
         const { error } = await supabase.from('users').upsert(dbUser);
-        if (error) console.error('Error seeding user:', error.message);
+        if (error) console.error('Error seeding user profile:', error.message);
     }
 
     // 2. Customers
