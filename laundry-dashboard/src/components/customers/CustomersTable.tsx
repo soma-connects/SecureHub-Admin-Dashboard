@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin, Eye, Filter, Download, Search, ShoppingBag, Trash2, Ban } from 'lucide-react';
 import type { Customer } from '../../types';
 import { CustomerDetailsModal } from './CustomerDetailsModal';
+import { api } from '../../lib/api';
+
 
 export function CustomersTable() {
     const [customers, setCustomers] = useState<Customer[]>([]);
@@ -11,8 +13,7 @@ export function CustomersTable() {
 
     const fetchCustomers = async () => {
         try {
-            const response = await fetch('http://localhost:3001/api/customers');
-            const data = await response.json();
+            const data = await api.get('/customers');
             setCustomers(data);
         } catch (error) {
             console.error('Failed to fetch customers:', error);
@@ -32,13 +33,7 @@ export function CustomersTable() {
         if (!confirm(`Are you sure you want to ${action} customer "${name}"?`)) return;
 
         try {
-            const response = await fetch(`http://localhost:3001/api/customers/${id}/status`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: newStatus }),
-            });
-
-            if (!response.ok) throw new Error(`Failed to ${action} customer`);
+            await api.patch(`/customers/${id}/status`, { status: newStatus });
 
             fetchCustomers();
         } catch (error) {
@@ -51,11 +46,7 @@ export function CustomersTable() {
         if (!confirm(`Are you sure you want to delete customer "${name}"? This cannot be undone.`)) return;
 
         try {
-            const response = await fetch(`http://localhost:3001/api/customers/${id}`, {
-                method: 'DELETE',
-            });
-
-            if (!response.ok) throw new Error('Failed to delete customer');
+            await api.delete(`/customers/${id}`);
 
             fetchCustomers();
         } catch (error) {

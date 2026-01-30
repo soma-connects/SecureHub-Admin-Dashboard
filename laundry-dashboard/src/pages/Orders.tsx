@@ -5,6 +5,7 @@ import { OrdersTable } from '../components/orders/OrdersTable';
 import { OrdersFilter } from '../components/orders/OrdersFilter';
 import { Filter, Download } from 'lucide-react';
 import { clsx } from 'clsx';
+import { api } from '../lib/api';
 
 
 function Orders() {
@@ -14,8 +15,7 @@ function Orders() {
 
     const fetchOrders = async () => {
         try {
-            const response = await fetch('http://localhost:3001/api/orders');
-            const data = await response.json();
+            const data = await api.get('/orders');
             setOrders(data);
         } catch (error) {
             console.error('Failed to fetch orders:', error);

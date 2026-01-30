@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { api } from '../../lib/api';
 
 export function ServicesStats() {
     const [stats, setStats] = useState({
@@ -11,19 +12,16 @@ export function ServicesStats() {
     useEffect(() => {
         const fetchServices = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/services');
-                if (response.ok) {
-                    const data = await response.json();
-                    // Calculate stats from the list
-                    const total = data.length;
-                    const active = data.filter((s: any) => s.status === 'Active').length;
-                    const inactive = data.filter((s: any) => s.status === 'Inactive').length;
-                    // Total orders per service might not be in the list view, or we sum them up if they are.
-                    // Assuming service object has totalOrders or similar.
-                    const totalOrders = data.reduce((acc: number, curr: any) => acc + (curr.total_orders || 0), 0);
+                const data = await api.get('/services');
+                // Calculate stats from the list
+                const total = data.length;
+                const active = data.filter((s: any) => s.status === 'Active').length;
+                const inactive = data.filter((s: any) => s.status === 'Inactive').length;
+                // Total orders per service might not be in the list view, or we sum them up if they are.
+                // Assuming service object has totalOrders or similar.
+                const totalOrders = data.reduce((acc: number, curr: any) => acc + (curr.total_orders || 0), 0);
 
-                    setStats({ total, active, inactive, totalOrders });
-                }
+                setStats({ total, active, inactive, totalOrders });
             } catch (error) {
                 console.error('Failed to fetch services for stats:', error);
             }

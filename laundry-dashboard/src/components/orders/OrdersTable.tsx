@@ -3,6 +3,8 @@ import { MoreVertical, Eye, Trash2, CheckCircle, XCircle } from 'lucide-react';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { OrderDetailsModal } from './OrderDetailsModal';
 import type { Order } from '../../types';
+import { api } from '../../lib/api';
+
 
 interface OrdersTableProps {
     orders: Order[];
@@ -42,19 +44,9 @@ export function OrdersTable({ orders, onRefresh }: OrdersTableProps) {
             if (action === 'delete') {
                 if (!window.confirm('Are you sure you want to delete this order?')) return;
 
-                const response = await fetch(`http://localhost:3001/api/orders/${orderId}`, {
-                    method: 'DELETE',
-                });
-
-                if (!response.ok) throw new Error('Failed to delete order');
+                await api.delete(`/orders/${orderId}`);
             } else if (action === 'status' && value) {
-                const response = await fetch(`http://localhost:3001/api/orders/${orderId}/status`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: value }),
-                });
-
-                if (!response.ok) throw new Error('Failed to update status');
+                await api.patch(`/orders/${orderId}/status`, { status: value });
             }
 
             setOpenDropdownId(null);

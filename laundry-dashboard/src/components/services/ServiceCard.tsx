@@ -6,7 +6,7 @@ interface ServiceCardProps {
     category: string; // 'Standard' | 'Premium' | 'Specialty'
     categoryColor: string; // bg-blue-100 text-blue-700
     description: string;
-    price: string;
+    price: string | number;
     turnaround: string;
     totalOrders: number;
     createdDate: string;

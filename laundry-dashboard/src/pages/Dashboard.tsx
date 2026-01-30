@@ -8,6 +8,7 @@ import { DateRangePicker } from '../components/common/DateRangePicker';
 import { RecentOrders } from '../components/dashboard/RecentOrders';
 import { ServiceDistribution } from '../components/dashboard/ServiceDistribution';
 import { useEffect, useState } from 'react';
+import { api } from '../lib/api';
 
 function Dashboard() {
     const { dateRange } = useDateRange();
@@ -35,11 +36,8 @@ function Dashboard() {
                 // Since I implemented /api/analytics in backend, I should call that.
                 // But frontend runs on 5173 and backend on 3001. I need to ensure CORS or proxy.
                 // For now assuming localhost:3001
-                const response = await fetch(`http://localhost:3001/api/analytics/stats?${query}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    setStats(data);
-                }
+                const data = await api.get(`/analytics/stats?${query}`);
+                setStats(data);
             } catch (error) {
                 console.error('Failed to fetch stats:', error);
             } finally {

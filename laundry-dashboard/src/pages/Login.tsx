@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shirt, Lock, Mail, Loader2, ArrowRight } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { api } from '../lib/api';
 
 export function Login() {
     const navigate = useNavigate();
+    const { login } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -15,18 +18,11 @@ export function Login() {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:3001/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
-            });
-
-            const data = await response.json();
+            const data = await api.post('/auth/login', { email, password });
 
             if (data.success) {
-                // Store user data/token (using localStorage for prototype)
-                localStorage.setItem('user', JSON.stringify(data.user));
-                localStorage.setItem('token', data.token);
+                // Use context login method
+                login(data.user, data.token);
                 navigate('/');
             } else {
                 setError(data.message || 'Login failed');

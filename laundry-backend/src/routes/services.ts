@@ -1,7 +1,11 @@
 import { Router } from 'express';
 import * as serviceController from '../controllers/serviceController';
+import { protect } from '../middlewares/authMiddleware';
+
 
 const router = Router();
+
+router.use(protect);
 
 router.get('/', serviceController.getServices);
 router.post('/', serviceController.createService);

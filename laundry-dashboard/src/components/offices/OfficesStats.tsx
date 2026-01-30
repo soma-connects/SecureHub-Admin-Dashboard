@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { api } from '../../lib/api';
 
 export function OfficesStats() {
     const [stats, setStats] = useState({
@@ -12,11 +13,8 @@ export function OfficesStats() {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/offices/stats');
-                if (response.ok) {
-                    const data = await response.json();
-                    setStats(data);
-                }
+                const data = await api.get('/offices/stats');
+                setStats(data);
             } catch (error) {
                 console.error('Failed to fetch office stats:', error);
             } finally {
@@ -28,10 +26,10 @@ export function OfficesStats() {
     }, []);
 
     const statItems = [
-        { label: 'Total Offices', value: stats.totalOffices.toString(), subtext: 'Across all locations', color: 'text-blue-600' },
-        { label: 'Open Locations', value: stats.openLocations.toString(), subtext: 'Currently operational', color: 'text-emerald-600' },
-        { label: 'Closed Locations', value: stats.closedLocations.toString(), subtext: 'Temporarily closed', color: 'text-orange-600' },
-        { label: 'Total Orders', value: stats.totalOrders > 0 ? stats.totalOrders.toString() : '-', subtext: 'All locations', color: 'text-purple-600' },
+        { label: 'Total Offices', value: (stats?.totalOffices || 0).toString(), subtext: 'Across all locations', color: 'text-blue-600' },
+        { label: 'Open Locations', value: (stats?.openLocations || 0).toString(), subtext: 'Currently operational', color: 'text-emerald-600' },
+        { label: 'Closed Locations', value: (stats?.closedLocations || 0).toString(), subtext: 'Temporarily closed', color: 'text-orange-600' },
+        { label: 'Total Orders', value: (stats?.totalOrders || 0) > 0 ? (stats?.totalOrders || 0).toString() : '-', subtext: 'All locations', color: 'text-purple-600' },
     ];
 
     if (loading) {

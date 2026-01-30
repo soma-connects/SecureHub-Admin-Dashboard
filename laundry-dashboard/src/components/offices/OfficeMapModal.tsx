@@ -1,4 +1,4 @@
-import { X, MapPin, Clock, Phone, Mail } from 'lucide-react';
+import { X, Clock, Phone, Mail } from 'lucide-react';
 import type { Office } from '../../types';
 
 interface OfficeMapModalProps {

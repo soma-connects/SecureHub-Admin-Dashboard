@@ -3,6 +3,8 @@ import { ServiceCard } from './ServiceCard';
 import { useState, useEffect } from 'react';
 import { ServiceModal } from './ServiceModal';
 import type { Service } from '../../types';
+import { api } from '../../lib/api';
+
 
 export function ServicesGrid() {
     const [services, setServices] = useState<Service[]>([]);
@@ -17,8 +19,7 @@ export function ServicesGrid() {
 
     const fetchServices = async () => {
         try {
-            const response = await fetch('http://localhost:3001/api/services');
-            const data = await response.json();
+            const data = await api.get('/services');
             setServices(data);
         } catch (error) {
             console.error('Failed to fetch services:', error);
@@ -39,27 +40,13 @@ export function ServicesGrid() {
 
     const handleSave = async (data: any) => {
         try {
-            let response;
             if (editingService) {
-                response = await fetch(`http://localhost:3001/api/services/${editingService.id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data),
-                });
+                await api.put(`/services/${editingService.id}`, data);
             } else {
-                response = await fetch('http://localhost:3001/api/services', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data),
-                });
+                await api.post('/services', data);
             }
-
-            if (response.ok) {
-                fetchServices();
-                setIsModalOpen(false);
-            } else {
-                console.error('Failed to save service');
-            }
+            fetchServices();
+            setIsModalOpen(false);
         } catch (error) {
             console.error('Error saving service:', error);
         }
@@ -68,14 +55,8 @@ export function ServicesGrid() {
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to delete this service?')) return;
         try {
-            const response = await fetch(`http://localhost:3001/api/services/${id}`, {
-                method: 'DELETE',
-            });
-            if (response.ok) {
-                fetchServices();
-            } else {
-                console.error('Failed to delete service');
-            }
+            await api.delete(`/services/${id}`);
+            fetchServices();
         } catch (error) {
             console.error('Error deleting service:', error);
         }

@@ -3,9 +3,7 @@ import { Layout } from '../components/layout/Layout';
 import { NotificationStats } from '../components/notifications/NotificationStats';
 import { NotificationList } from '../components/notifications/NotificationList';
 import { CheckCheck, Trash2, Loader2 } from 'lucide-react';
-
-// Use environment variable for API URL in production
-const API_URL = 'http://localhost:3001/api';
+import { api } from '../lib/api';
 
 function Notifications() {
     const [notifications, setNotifications] = useState<any[]>([]);
@@ -14,11 +12,8 @@ function Notifications() {
 
     const fetchNotifications = async () => {
         try {
-            const response = await fetch(`${API_URL}/notifications`);
-            if (response.ok) {
-                const data = await response.json();
-                setNotifications(data.data.notifications || []);
-            }
+            const data = await api.get('/notifications');
+            setNotifications(data.data.notifications || []);
         } catch (error) {
             console.error('Failed to fetch notifications:', error);
         } finally {
@@ -33,12 +28,8 @@ function Notifications() {
     const handleMarkAllAsRead = async () => {
         setActionLoading(true);
         try {
-            const response = await fetch(`${API_URL}/notifications/read-all`, {
-                method: 'PATCH',
-            });
-            if (response.ok) {
-                await fetchNotifications();
-            }
+            await api.patch('/notifications/read-all', {});
+            await fetchNotifications();
         } catch (error) {
             console.error('Failed to mark all as read:', error);
         } finally {
@@ -51,12 +42,8 @@ function Notifications() {
 
         setActionLoading(true);
         try {
-            const response = await fetch(`${API_URL}/notifications/read`, {
-                method: 'DELETE',
-            });
-            if (response.ok) {
-                await fetchNotifications();
-            }
+            await api.delete('/notifications/read');
+            await fetchNotifications();
         } catch (error) {
             console.error('Failed to clear read notifications:', error);
         } finally {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { X, Mail, Phone, MapPin, Package, Calendar } from 'lucide-react';
+import { X, Mail, Phone, MapPin, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { api } from '../../lib/api';
 
 interface CustomerDetailsModalProps {
     isOpen: boolean;
@@ -45,11 +46,8 @@ export function CustomerDetailsModal({ isOpen, onClose, customerId }: CustomerDe
         if (!customerId) return;
         setLoading(true);
         try {
-            const response = await fetch(`http://localhost:3001/api/customers/${customerId}`);
-            if (response.ok) {
-                const data = await response.json();
-                setCustomer(data);
-            }
+            const data = await api.get(`/customers/${customerId}`);
+            setCustomer(data);
         } catch (error) {
             console.error('Failed to fetch customer details:', error);
         } finally {

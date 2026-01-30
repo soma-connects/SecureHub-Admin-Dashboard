@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { OfficeModal } from './OfficeModal';
 import { OfficeMapModal } from './OfficeMapModal';
 import type { Office } from '../../types';
+import { api } from '../../lib/api';
+
 
 export function OfficesGrid() {
     const [offices, setOffices] = useState<Office[]>([]);
@@ -15,8 +17,7 @@ export function OfficesGrid() {
     useEffect(() => {
         const fetchOffices = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/offices');
-                const data = await response.json();
+                const data = await api.get('/offices');
                 setOffices(data);
             } catch (error) {
                 console.error('Failed to fetch offices:', error);
@@ -41,15 +42,8 @@ export function OfficesGrid() {
         if (!window.confirm('Are you sure you want to delete this office?')) return;
 
         try {
-            const response = await fetch(`http://localhost:3001/api/offices/${id}`, {
-                method: 'DELETE',
-            });
-
-            if (response.ok) {
-                setOffices(prev => prev.filter(o => o.id !== id));
-            } else {
-                console.error('Failed to delete office');
-            }
+            await api.delete(`/offices/${id}`);
+            setOffices(prev => prev.filter(o => o.id !== id));
         } catch (error) {
             console.error('Error deleting office:', error);
         }
@@ -67,32 +61,18 @@ export function OfficesGrid() {
 
     const handleSave = async (data: Partial<Office>) => {
         try {
-            let response;
             if (currentOffice) {
                 // Update
-                response = await fetch(`http://localhost:3001/api/offices/${currentOffice.id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data),
-                });
+                await api.put(`/offices/${currentOffice.id}`, data);
             } else {
                 // Create
-                response = await fetch('http://localhost:3001/api/offices', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data),
-                });
+                await api.post('/offices', data);
             }
 
-            if (response.ok) {
-                // Refresh list
-                const refreshed = await fetch('http://localhost:3001/api/offices');
-                const newData = await refreshed.json();
-                setOffices(newData);
-                setIsModalOpen(false);
-            } else {
-                console.error('Failed to save office');
-            }
+            // Refresh list
+            const newData = await api.get('/offices');
+            setOffices(newData);
+            setIsModalOpen(false);
         } catch (error) {
             console.error('Error saving office:', error);
         }

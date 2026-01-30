@@ -44,12 +44,14 @@ export interface Service {
     name: string;
     category: string;
     categoryColor: string;
-    price: string;
+    price: string | number;
+    price_unit?: string;
     turnaround: string;
     totalOrders: number;
     createdDate: string;
     description: string;
-    status: 'Active' | 'Inactive'; // inferred
+    status: 'Active' | 'Inactive';
+    active?: boolean; // Optional if we use it, or map to status
 }
 
 export interface Customer {

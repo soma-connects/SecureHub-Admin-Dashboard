@@ -8,20 +8,26 @@ import Notifications from './pages/Notifications';
 import Settings from './pages/Settings';
 
 import { Login } from './pages/Login';
+import { AuthProvider } from './context/AuthContext';
+import { RequireAuth } from './components/auth/RequireAuth';
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/orders" element={<Orders />} />
-        <Route path="/customers" element={<Customers />} />
-        <Route path="/services" element={<Services />} />
-        <Route path="/offices" element={<Offices />} />
-        <Route path="/notifications" element={<Notifications />} />
-        <Route path="/settings" element={<Settings />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+
+          {/* Protected Routes */}
+          <Route path="/" element={<RequireAuth><Dashboard /></RequireAuth>} />
+          <Route path="/orders" element={<RequireAuth><Orders /></RequireAuth>} />
+          <Route path="/customers" element={<RequireAuth><Customers /></RequireAuth>} />
+          <Route path="/services" element={<RequireAuth><Services /></RequireAuth>} />
+          <Route path="/offices" element={<RequireAuth><Offices /></RequireAuth>} />
+          <Route path="/notifications" element={<RequireAuth><Notifications /></RequireAuth>} />
+          <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
+        </Routes>
+      </AuthProvider>
     </Router>
   );
 }

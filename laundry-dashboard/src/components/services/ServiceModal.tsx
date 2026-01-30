@@ -126,7 +126,7 @@ export function ServiceModal({ isOpen, onClose, service, onSave }: ServiceModalP
                                 type="checkbox"
                                 id="active"
                                 className="w-4 h-4 text-blue-600 rounded border-slate-700 bg-slate-900 focus:ring-blue-500 focus:ring-offset-slate-900"
-                                defaultChecked={service?.active ?? true}
+                                defaultChecked={service ? service.status === 'Active' : true}
                             />
                             <label htmlFor="active" className="text-sm font-medium text-slate-300">Service is active and available to customers</label>
                         </div>
